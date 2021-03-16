@@ -1,11 +1,19 @@
 import Link from 'next/link'
 
-const Button = (props) => {
-  return (
-    <Link href={props.link}>
-      <a className='btn'>{props.children}</a>
-    </Link>
-  )
+const Button = ({ link, children, onClick }) => {
+  if (link) {
+    return (
+      <Link href={link}>
+        <a className='btn'>{children}</a>
+      </Link>
+    )
+  } else {
+    return (
+      <button onClick={onClick} className='btn'>
+        {children}
+      </button>
+    )
+  }
 }
 
 export default Button
