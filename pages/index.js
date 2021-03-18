@@ -1,15 +1,21 @@
+import { Fragment } from 'react'
+import Head from 'next/head'
 import { getFeaturedEvents } from '../helpers/api-utils'
 import EventList from '../components/events/event-list'
 
-const StartingPage = ({ events }) => {
-  const featuredEvents = getFeaturedEvents()
-
-  // console.log(events)
-
+const HomePage = ({ events }) => {
+  // console.log(props)
   return (
-    <div>
+    <Fragment>
+      <Head>
+        <title>NextJS Events</title>
+        <meta
+          name='description'
+          content='Find a lot of great events that allow you to evolve...'
+        />
+      </Head>
       <EventList items={events} />
-    </div>
+    </Fragment>
   )
 }
 
@@ -19,4 +25,4 @@ export const getStaticProps = async () => {
   return { props: { events: featuredEvents }, revalidate: 1800 }
 }
 
-export default StartingPage
+export default HomePage
