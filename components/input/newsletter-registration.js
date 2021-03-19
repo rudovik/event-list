@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 import classes from './newsletter-registration.module.css'
+import NotificationContext from '../../store/notification-context'
 
 const validateEmail = (email) => {
   const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
@@ -8,6 +9,8 @@ const validateEmail = (email) => {
 
 function NewsletterRegistration() {
   const [email, setEmail] = useState()
+
+  const notificationContext = useContext(NotificationContext)
 
   function registrationHandler(event) {
     event.preventDefault()
@@ -21,6 +24,12 @@ function NewsletterRegistration() {
       email,
     }
 
+    notificationContext.showNotification({
+      title: 'Signing up...',
+      message: 'Registering for newsletter.',
+      status: 'pending',
+    })
+
     fetch('/api/email', {
       method: 'POST',
       body: JSON.stringify(reqBody),
@@ -28,12 +37,29 @@ function NewsletterRegistration() {
         'Content-Type': 'application/json',
       },
     })
-      .then((response) => response.json())
-      .then((data) => console.log(data))
+      .then((response) => {
+        if (response.ok) {
+          return response.json()
+        }
 
-    // fetch user input (state or refs)
-    // optional: validate input
-    // send valid data to API
+        return response.json().then((data) => {
+          throw new Error(data.message || 'Something went wrong!')
+        })
+      })
+      .then((data) => {
+        notificationContext.showNotification({
+          title: 'Success!',
+          message: 'Successfully registered for newsletter! ',
+          status: 'success',
+        })
+      })
+      .catch((error) => {
+        notificationContext.showNotification({
+          title: 'Error!',
+          message: error.message || 'Something went wrong!',
+          status: 'error',
+        })
+      })
   }
 
   const changeHandler = (e) => {
